@@ -1,0 +1,8 @@
+code
+https://blog.floydhub.com/a-beginners-guide-on-recurrent-neural-networks-with-pytorch/
+https://pytorch.org/tutorials/beginner/torchtext_translation_tutorial.html?highlight=transformer
+https://github.com/omarsar/pytorch_neural_machine_translation_attention
+https://tsdaemon.github.io/2018/07/08/nmt-with-pytorch-encoder-decoder.html
+
+dataset
+http://www.manythings.org/anki/
