@@ -13,7 +13,8 @@ import random
 import math
 import time
 
-from model.vanilla_seq2seq import Encoder, Decoder, Seq2Seq
+#from model.vanilla_seq2seq import Encoder, Decoder, Seq2Seq
+from model.rnn_seq2seq import Encoder, Decoder, Seq2Seq
 from trainer.base_trainer import  train, evaluate
 from util.utils import count_parameters, init_weights, epoch_time
 
