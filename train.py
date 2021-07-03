@@ -3,6 +3,7 @@ import json
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from util.utils import initialize_config, count_parameters
 from torchtext.legacy.data import BucketIterator
 from data.multi30k import Multi30kData
 
@@ -14,22 +15,24 @@ import math
 import time
 
 #from model.vanilla_seq2seq import Encoder, Decoder, Seq2Seq
-from model.rnn_seq2seq import Encoder, Decoder, Seq2Seq
+from model.vanilla_seq2seq import Encoder, Decoder, Seq2Seq
 from trainer.base_trainer import  train, evaluate
 from util.utils import count_parameters, init_weights, epoch_time
 
-SEED = 1234
-random.seed(SEED)
-np.random.seed(SEED)
-torch.manual_seed(SEED)
-torch.cuda.manual_seed(SEED)
 torch.backends.cudnn.deterministic = True
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-def main():
+def main(config):
 
+    random.seed(config["seed"])
+    np.random.seed(config["seed"])
+    torch.manual_seed(config["seed"])
+    torch.cuda.manual_seed(config["seed"])
+    #
+    # Data preparation
+    #
     MData = Multi30kData()
     train_data, valid_data, test_data, SRC, TRG = MData.splits()
 
@@ -44,13 +47,14 @@ def main():
     print(f"Unique tokens in target (en) vocabulary: {len(TRG.vocab)}")
 
 
-    BATCH_SIZE = 128
+    BATCH_SIZE = config['trainer']['batch_size']
 
     train_iterator, valid_iterator, test_iterator = BucketIterator.splits(
         (train_data, valid_data, test_data),
         batch_size = BATCH_SIZE,
         device = device)
 
+    '''
     INPUT_DIM = len(SRC.vocab)
     OUTPUT_DIM = len(TRG.vocab)
     ENC_EMB_DIM = 256
@@ -59,23 +63,36 @@ def main():
     N_LAYERS = 2
     ENC_DROPOUT = 0.5
     DEC_DROPOUT = 0.5
+    '''
+    config["model_encoder"]["input_dim"] = len(SRC.vocab)
+    config["model_decoder"]["output_dim"] = len(TRG.vocab)
 
-    enc = Encoder(INPUT_DIM, ENC_EMB_DIM, HID_DIM, N_LAYERS, ENC_DROPOUT)
-    dec = Decoder(OUTPUT_DIM, DEC_EMB_DIM, HID_DIM, N_LAYERS, DEC_DROPOUT)
+    enc = initialize_config(config["model_encoder"])
+    dec = initialize_config(config["model_decoder"])
+    #enc = Encoder(INPUT_DIM, ENC_EMB_DIM, HID_DIM, N_LAYERS, ENC_DROPOUT)
+    #dec = Decoder(OUTPUT_DIM, DEC_EMB_DIM, HID_DIM, N_LAYERS, DEC_DROPOUT)
 
     model = Seq2Seq(enc, dec, device).to(device)
     model.apply(init_weights)
 
     print(f'The model has {count_parameters(model):,} trainable parameters')
 
-    optimizer = optim.Adam(model.parameters())
+    #
+    # Optimizer
+    #
+    optimizer = torch.optim.Adam(
+        params=model.parameters(),
+        lr=config["optimizer"]["lr"],
+        betas=(config["optimizer"]["beta1"], config["optimizer"]["beta2"]),
+        weight_decay=config["optimizer"]["weight_decay"]
+    )
 
     TRG_PAD_IDX = TRG.vocab.stoi[TRG.pad_token]
 
     criterion = nn.CrossEntropyLoss(ignore_index = TRG_PAD_IDX)
 
     # Training
-    N_EPOCHS = 10
+    N_EPOCHS = config['trainer']['epochs']
     CLIP = 1
 
     best_valid_loss = float('inf')
@@ -114,12 +131,11 @@ if __name__ == '__main__':
     parser.add_argument("-p", "--preloaded_model_path", type=str, help="Path of the *.Pth file of the model.")
     parser.add_argument("-r", "--resume", action="store_true", help="Resume experiment from latest checkpoint.")
     args = parser.parse_args()
-    '''
+
     if args.preloaded_model_path:
         assert not args.resume, "Resume conflict with preloaded model. Please use one of them."
 
     with open(args.config, "r") as f:
         config = json.load(f)
-    '''
-    #main(config, resume=args.resume)
-    main()
+
+    main(config)

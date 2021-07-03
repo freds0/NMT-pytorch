@@ -3,3 +3,10 @@
 This work is based on [Bentrevett's tutorial](https://github.com/bentrevett/pytorch-seq2seq). 
 
 This repo contains tutorials covering how to do Neural Machine Traslation using [PyTorch](https://github.com/pytorch/pytorch) 1.8 and [torchtext](https://github.com/pytorch/text) 0.9 using Python 3.8.
+
+## Installation
+
+```sh
+python -m spacy download en_core_web_sm
+python -m spacy download de_core_news_sm
+```
