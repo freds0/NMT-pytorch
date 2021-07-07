@@ -14,7 +14,6 @@ import random
 import math
 import time
 
-#from model.vanilla_seq2seq import Encoder, Decoder, Seq2Seq
 from model.vanilla_seq2seq import Encoder, Decoder, Seq2Seq
 from trainer.base_trainer import  train, evaluate
 from util.utils import count_parameters, init_weights, epoch_time
@@ -54,23 +53,12 @@ def main(config):
         batch_size = BATCH_SIZE,
         device = device)
 
-    '''
-    INPUT_DIM = len(SRC.vocab)
-    OUTPUT_DIM = len(TRG.vocab)
-    ENC_EMB_DIM = 256
-    DEC_EMB_DIM = 256
-    HID_DIM = 512
-    N_LAYERS = 2
-    ENC_DROPOUT = 0.5
-    DEC_DROPOUT = 0.5
-    '''
-    config["model_encoder"]["input_dim"] = len(SRC.vocab)
-    config["model_decoder"]["output_dim"] = len(TRG.vocab)
+
+    config["model_encoder"]["args"]["input_dim"] = len(SRC.vocab)
+    config["model_decoder"]["args"]["output_dim"] = len(TRG.vocab)
 
     enc = initialize_config(config["model_encoder"])
     dec = initialize_config(config["model_decoder"])
-    #enc = Encoder(INPUT_DIM, ENC_EMB_DIM, HID_DIM, N_LAYERS, ENC_DROPOUT)
-    #dec = Decoder(OUTPUT_DIM, DEC_EMB_DIM, HID_DIM, N_LAYERS, DEC_DROPOUT)
 
     model = Seq2Seq(enc, dec, device).to(device)
     model.apply(init_weights)
