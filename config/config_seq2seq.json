@@ -1,0 +1,63 @@
+{
+    "seed": 42,
+    "description": "GRU Seq2Seq Model",
+    "root_dir": "./checkpoints/gru_seq2seq",
+    "cudnn_deterministic": false,
+    "dataset": {
+        "csv_path" : "./data/NoThemeTweets.csv",
+        "test_size": 0.10,
+        "val_size": 0.05,
+        "include_lengths": false
+    },
+    "model_encoder": {
+        "module": "model.gru_seq2seq",
+        "main": "Encoder",
+        "args": {
+            "input_dim": 0, 
+            "emb_dim": 256, 
+            "hid_dim": 512, 
+            "dropout": 0.5
+        }
+    },
+    "model_decoder": {
+        "module": "model.gru_seq2seq",
+        "main": "Decoder",
+        "args": {
+            "output_dim": 0, 
+            "emb_dim": 256, 
+            "hid_dim": 512, 
+            "dropout": 0.5
+        }
+    },
+    "seq2seq_model": {
+        "module": "model.gru_seq2seq",
+        "main": "Seq2Seq"
+    },
+    "optimizer": {
+        "lr": 0.0001,
+        "beta1": 0.9,
+        "beta2": 0.999,
+        "weight_decay" : 0.0001
+    },
+    "loss_function": {
+        "module": "model.loss",
+        "main": "CrossEntropyLoss",
+        "args": {}
+    },
+    "trainer": {
+        "module": "trainer.seq2seq_trainer",
+        "main": "Trainer",
+        "epochs": 10,
+        "batch_size": 2,
+        "sort_within_batch": false,
+        "save_checkpoint_interval": 1,
+        "test": {
+            "interval": 1,
+            "find_max": true
+        }
+    },
+    "inferencer": {
+        "module": "inferencer.wav_inferencer",
+        "main": "Inferencer"
+    }
+}

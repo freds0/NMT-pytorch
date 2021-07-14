@@ -34,6 +34,8 @@ def train(model, iterator, optimizer, criterion, clip):
 
         epoch_loss += loss.item()
 
+        print("Step {}/{} Loss {}".format(i, len(iterator), loss.item()))
+
     return epoch_loss / len(iterator)
 
 

@@ -14,7 +14,6 @@ import random
 import math
 import time
 
-from model.vanilla_seq2seq import Encoder, Decoder, Seq2Seq
 from trainer.base_trainer import  train, evaluate
 from util.utils import count_parameters, init_weights, epoch_time
 
@@ -60,7 +59,14 @@ def main(config):
     enc = initialize_config(config["model_encoder"])
     dec = initialize_config(config["model_decoder"])
 
-    model = Seq2Seq(enc, dec, device).to(device)
+    config["seq2seq_model"]["args"] = {
+        "encoder" : enc,
+        "decoder" : dec,
+        "device" : device
+    }
+    
+    model = initialize_config(config["seq2seq_model"])
+    model = model.to(device)
     model.apply(init_weights)
 
     print(f'The model has {count_parameters(model):,} trainable parameters')
