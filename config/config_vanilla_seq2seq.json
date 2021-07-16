@@ -1,7 +1,7 @@
 {
     "seed": 42,
     "description": "Vanilla Seq2Seq Model",
-    "root_dir": "./checkpoints/vanilla_seq2seq",
+    "checkpoint_dir": "./checkpoints/vanilla_seq2seq",
     "cudnn_deterministic": false,
     "dataset": {
         "csv_path" : "./data/NoThemeTweets.csv",
@@ -43,23 +43,20 @@
     },
     "loss_function": {
         "module": "model.loss",
-        "main": "CrossEntropyLoss",
-        "args": {}
+        "main": "binary_cross_entropy",
+        "args": {
+            "ignore_index": ""
+        }
     },
     "trainer": {
         "module": "trainer.seq2seq_trainer",
         "main": "Trainer",
         "epochs": 10,
         "batch_size": 2,
-        "sort_within_batch": false,
         "save_checkpoint_interval": 1,
         "test": {
             "interval": 1,
             "find_max": true
         }
-    },
-    "inferencer": {
-        "module": "inferencer.wav_inferencer",
-        "main": "Inferencer"
     }
 }

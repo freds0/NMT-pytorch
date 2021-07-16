@@ -9,7 +9,7 @@ from data.multi30k import Multi30kData
 
 import spacy
 import numpy as np
-
+import os
 import random
 import math
 import time
@@ -83,13 +83,17 @@ def main(config):
 
     TRG_PAD_IDX = TRG.vocab.stoi[TRG.pad_token]
 
-    criterion = nn.CrossEntropyLoss(ignore_index = TRG_PAD_IDX)
+    #criterion = nn.CrossEntropyLoss(ignore_index = TRG_PAD_IDX)
+    config["loss_function"]["args"]["ignore_index"] = TRG_PAD_IDX
+    criterion = initialize_config(config["loss_function"])
 
     # Training
     N_EPOCHS = config['trainer']['epochs']
     CLIP = 1
 
     best_valid_loss = float('inf')
+
+    os.makedirs(config["checkpoint_dir"], exist_ok=True)
 
     for epoch in range(N_EPOCHS):
 
@@ -103,8 +107,9 @@ def main(config):
         epoch_mins, epoch_secs = epoch_time(start_time, end_time)
 
         if valid_loss < best_valid_loss:
-            best_valid_loss = valid_loss
-            torch.save(model.state_dict(), 'tut1-model.pt')
+            print(f'Saving checkpoint! Best Loss : {valid_loss}| Old Loss: {best_valid_loss} ')
+            best_valid_loss = valid_loss 
+            torch.save(model.state_dict(), os.path.join(config["checkpoint_dir"], 'best_model'))
 
         print(f'Epoch: {epoch + 1:02} | Time: {epoch_mins}m {epoch_secs}s')
         print(f'\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}')
