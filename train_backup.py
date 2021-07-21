@@ -6,19 +6,24 @@ import torch.optim as optim
 from util.utils import initialize_config, count_parameters
 from torchtext.legacy.data import BucketIterator
 from data.multi30k import Multi30kData
+
+import spacy
 import numpy as np
 import os
 import random
 import math
 import time
 
-#from trainer.base_trainer import  train, evaluate
+from trainer.base_trainer import  train, evaluate
 from util.utils import count_parameters, init_weights, epoch_time
+
+torch.backends.cudnn.deterministic = True
+
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-def main(config, resume):
-    torch.backends.cudnn.deterministic = config["cudnn_deterministic"]
+def main(config):
+
     random.seed(config["seed"])
     np.random.seed(config["seed"])
     torch.manual_seed(config["seed"])
@@ -59,7 +64,7 @@ def main(config, resume):
         "decoder" : dec,
         "device" : device
     }
-
+    
     model = initialize_config(config["seq2seq_model"])
     model = model.to(device)
     model.apply(init_weights)
@@ -75,7 +80,6 @@ def main(config, resume):
         betas=(config["optimizer"]["beta1"], config["optimizer"]["beta2"]),
         weight_decay=config["optimizer"]["weight_decay"]
     )
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size = 20, gamma = 0.1)
 
     TRG_PAD_IDX = TRG.vocab.stoi[TRG.pad_token]
 
@@ -85,32 +89,12 @@ def main(config, resume):
 
     # Training
     N_EPOCHS = config['trainer']['epochs']
-    CLIP = config['trainer']['clip']
+    CLIP = 1
 
     best_valid_loss = float('inf')
 
     os.makedirs(config["checkpoint_dir"], exist_ok=True)
 
-    #
-    # Trainer
-    #
-    trainer_class = initialize_config(config["trainer"], pass_args=False)
-    trainer = trainer_class(
-        resume=resume,
-        model=model,
-        loss_function=criterion,
-        optimizer=optimizer,
-        scheduler=scheduler,
-        train_dataloader=train_iterator,
-        test_dataloader=valid_iterator,
-        epochs=config['trainer']['epochs'],
-        save_checkpoint_interval=config['trainer']['save_checkpoint_interval'],
-        test_interval=config['trainer']['test']['interval'],
-        find_max=config['trainer']['test']['find_max']
-    )
-    trainer.train()
-
-    '''
     for epoch in range(N_EPOCHS):
 
         start_time = time.time()
@@ -124,14 +108,14 @@ def main(config, resume):
 
         if valid_loss < best_valid_loss:
             print(f'Saving checkpoint! Best Loss : {valid_loss}| Old Loss: {best_valid_loss} ')
-            best_valid_loss = valid_loss
+            best_valid_loss = valid_loss 
             torch.save(model.state_dict(), os.path.join(config["checkpoint_dir"], 'best_model'))
 
         print(f'Epoch: {epoch + 1:02} | Time: {epoch_mins}m {epoch_secs}s')
         print(f'\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}')
         print(f'\t Val. Loss: {valid_loss:.3f} |  Val. PPL: {math.exp(valid_loss):7.3f}')
 
-    '''
+
     # Evaluating
     model.load_state_dict(torch.load('tut1-model.pt'))
 
@@ -153,4 +137,4 @@ if __name__ == '__main__':
     with open(args.config, "r") as f:
         config = json.load(f)
 
-    main(config, resume=args.resume)
+    main(config)
