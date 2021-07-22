@@ -7,7 +7,7 @@ from util import summary
 from util.utils import prepare_empty_dir, ExecutionTime, prepare_device
 
 class BaseTrainer:
-    def __init__(self, resume: bool, model, loss_function, optimizer, scheduler, epochs, save_checkpoint_interval, test_interval, find_max):
+    def __init__(self, resume: bool, model, loss_function, optimizer, scheduler, epochs, save_checkpoint_interval, test_interval, output_dir, checkpoints_dir, find_max):
         self.n_gpu = torch.cuda.device_count()
         self.device = prepare_device(self.n_gpu)
         self.optimizer = optimizer
@@ -118,7 +118,7 @@ class BaseTrainer:
         Notes:
             - latest_model.tar:
                 Contains all checkpoint information, including optimizer parameters, model parameters, etc. New checkpoint will overwrite old one.
-            - model_<epoch>.pth: 
+            - model_<epoch>.pth:
                 The parameters of the model. Follow-up we can specify epoch to inference.
             - best_model.tar:
                 Like latest_model, but only saved when <is_best> is True.
@@ -194,4 +194,3 @@ class BaseTrainer:
 
     def _test_epoch(self, epoch):
         raise NotImplementedError
-

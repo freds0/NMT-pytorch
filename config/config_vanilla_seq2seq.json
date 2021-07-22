@@ -1,7 +1,8 @@
 {
     "seed": 42,
     "description": "Vanilla Seq2Seq Model",
-    "checkpoint_dir": "./checkpoints/vanilla_seq2seq",
+    "output_dir": "./checkpoints/",
+    "checkpoints_dir": "vanilla_seq2seq",
     "cudnn_deterministic": false,
     "dataset": {
         "csv_path" : "./data/NoThemeTweets.csv",

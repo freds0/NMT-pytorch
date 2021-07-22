@@ -47,6 +47,9 @@ def main(config, resume):
         batch_size = BATCH_SIZE,
         device = device)
 
+    if config["seq2seq_model"]["module"] == "model.seq2seq_with_attention":
+        att = initialize_config(config["model_attention"])
+        config["model_decoder"]["args"]["attention"] = att
 
     config["model_encoder"]["args"]["input_dim"] = len(SRC.vocab)
     config["model_decoder"]["args"]["output_dim"] = len(TRG.vocab)
@@ -89,7 +92,7 @@ def main(config, resume):
 
     best_valid_loss = float('inf')
 
-    os.makedirs(config["checkpoint_dir"], exist_ok=True)
+    os.makedirs(config["checkpoints_dir"], exist_ok=True)
 
     #
     # Trainer
@@ -106,6 +109,8 @@ def main(config, resume):
         epochs=config['trainer']['epochs'],
         save_checkpoint_interval=config['trainer']['save_checkpoint_interval'],
         test_interval=config['trainer']['test']['interval'],
+        output_dir=config['output_dir'],
+        checkpoints_dir=config['checkpoints_dir'],
         find_max=config['trainer']['test']['find_max']
     )
     trainer.train()

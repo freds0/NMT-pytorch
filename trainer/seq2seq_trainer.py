@@ -5,8 +5,8 @@ from trainer.base_trainer import BaseTrainer
 
 class Trainer(BaseTrainer):
     def __init__(self, resume: bool, model, loss_function, optimizer, scheduler, train_dataloader, test_dataloader, epochs, save_checkpoint_interval,
-                 test_interval, find_max):
-        super(Trainer, self).__init__(resume, model, loss_function, optimizer, scheduler, epochs, save_checkpoint_interval, test_interval, find_max)
+                 test_interval, output_dir, checkpoints_dir, find_max):
+        super(Trainer, self).__init__(resume, model, loss_function, optimizer, scheduler, epochs, save_checkpoint_interval, test_interval, output_dir, checkpoints_dir, find_max)
         self.train_dataloader = train_dataloader
         self.test_dataloader = test_dataloader
 

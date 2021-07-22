@@ -1,31 +1,42 @@
 {
     "seed": 42,
-    "description": "GRU Seq2Seq Model",
+    "description": "Seq2Seq with Attention Model",
     "output_dir": "./checkpoints/",
-    "checkpoints_dir": "gru_seq2seq",
+    "checkpoints_dir": "seq2seq_with_attention",
     "cudnn_deterministic": true,
     "model_encoder": {
-        "module": "model.gru_seq2seq",
+        "module": "model.seq2seq_with_attention",
         "main": "Encoder",
         "args": {
             "input_dim": 0,
             "emb_dim": 256,
-            "hid_dim": 512,
+            "enc_hid_dim": 512,
+            "dec_hid_dim": 512,
             "dropout": 0.5
         }
     },
+    "model_attention": {
+        "module": "model.seq2seq_with_attention",
+        "main": "Attention",
+        "args": {
+            "enc_hid_dim": 512,
+            "dec_hid_dim": 512
+        }
+    },
     "model_decoder": {
-        "module": "model.gru_seq2seq",
+        "module": "model.seq2seq_with_attention",
         "main": "Decoder",
         "args": {
             "output_dim": 0,
             "emb_dim": 256,
-            "hid_dim": 512,
-            "dropout": 0.5
+            "enc_hid_dim": 512,
+            "dec_hid_dim": 512,
+            "dropout": 0.5,
+            "attention": ""
         }
     },
     "seq2seq_model": {
-        "module": "model.gru_seq2seq",
+        "module": "model.seq2seq_with_attention",
         "main": "Seq2Seq"
     },
     "optimizer": {
