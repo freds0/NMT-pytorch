@@ -5,11 +5,12 @@ from util.tokenizers import tokenize_de, tokenize_en
 
 class Multi30kData:
 
-    def  __init__(self):
+    def  __init__(self, include_lengths = False):
 
         self.SRC = Field(tokenize = tokenize_de,
                     init_token = '<sos>',
                     eos_token = '<eos>',
+                    include_lengths = include_lengths,
                     lower = True)
 
         self.TRG = Field(tokenize = tokenize_en,

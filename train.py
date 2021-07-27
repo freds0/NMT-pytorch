@@ -26,7 +26,8 @@ def main(config, resume):
     #
     # Data preparation
     #
-    MData = Multi30kData()
+    include_lengths = True if config["data"]["include_lengths"] else False
+    MData = Multi30kData(include_lengths = include_lengths)
     train_data, valid_data, test_data, SRC, TRG = MData.splits()
 
     print(f"Number of training examples: {len(train_data.examples)}")
@@ -45,6 +46,8 @@ def main(config, resume):
     train_iterator, valid_iterator, test_iterator = BucketIterator.splits(
         (train_data, valid_data, test_data),
         batch_size = BATCH_SIZE,
+        sort_within_batch = True,
+        sort_key = lambda x : len(x.src),
         device = device)
 
     if config["seq2seq_model"]["module"] == "model.seq2seq_with_attention":
@@ -62,6 +65,10 @@ def main(config, resume):
         "decoder" : dec,
         "device" : device
     }
+
+    if config["seq2seq_model"]["module"] == "model.seq2seq_with_attention_padded":
+        config["seq2seq_model"]["args"]["src_pad_idx"] = SRC.vocab.stoi[SRC.pad_token]
+
 
     model = initialize_config(config["seq2seq_model"])
     model = model.to(device)
