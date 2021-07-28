@@ -4,6 +4,13 @@
     "output_dir": "./checkpoints/",
     "checkpoints_dir": "seq2seq_with_attention",
     "cudnn_deterministic": true,
+    "dataset": {
+      "module": "data.multi30k",
+      "main": "Multi30kData",
+      "args": {
+        "include_lengths": false
+      }
+    },
     "model_encoder": {
         "module": "model.seq2seq_with_attention",
         "main": "Encoder",
@@ -63,5 +70,8 @@
             "interval": 1,
             "find_max": true
         }
+    },
+    "data": {
+        "sort_within_batch": false
     }
 }

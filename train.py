@@ -26,8 +26,8 @@ def main(config, resume):
     #
     # Data preparation
     #
-    include_lengths = True if config["data"]["include_lengths"] else False
-    MData = Multi30kData(include_lengths = include_lengths)
+    #MData = Multi30kData(include_lengths = config['dataset']['include_lengths'])
+    MData = initialize_config(config["dataset"])
     train_data, valid_data, test_data, SRC, TRG = MData.splits()
 
     print(f"Number of training examples: {len(train_data.examples)}")
@@ -40,16 +40,20 @@ def main(config, resume):
     print(f"Unique tokens in source (de) vocabulary: {len(SRC.vocab)}")
     print(f"Unique tokens in target (en) vocabulary: {len(TRG.vocab)}")
 
-
-    BATCH_SIZE = config['trainer']['batch_size']
-
+    #if config["seq2seq_model"]["module"] == "model.seq2seq_with_attention":
     train_iterator, valid_iterator, test_iterator = BucketIterator.splits(
         (train_data, valid_data, test_data),
-        batch_size = BATCH_SIZE,
-        sort_within_batch = True,
+        batch_size = config['trainer']['batch_size'],
+        sort_within_batch = config['data']['sort_within_batch'],
         sort_key = lambda x : len(x.src),
         device = device)
-
+    '''
+    else:
+        train_iterator, valid_iterator, test_iterator = BucketIterator.splits(
+            (train_data, valid_data, test_data),
+            batch_size = BATCH_SIZE,
+            device = device)
+    '''
     if config["seq2seq_model"]["module"] == "model.seq2seq_with_attention":
         att = initialize_config(config["model_attention"])
         config["model_decoder"]["args"]["attention"] = att

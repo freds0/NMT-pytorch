@@ -4,6 +4,13 @@
     "output_dir": "./checkpoints/",
     "checkpoints_dir": "gru_seq2seq",
     "cudnn_deterministic": true,
+    "dataset": {
+      "module": "data.multi30k",
+      "main": "Multi30kData",
+      "args": {
+        "include_lengths": false
+      }
+    },
     "model_encoder": {
         "module": "model.gru_seq2seq",
         "main": "Encoder",
@@ -52,5 +59,8 @@
             "interval": 1,
             "find_max": true
         }
+    },
+    "data": {
+        "sort_within_batch": false
     }
 }

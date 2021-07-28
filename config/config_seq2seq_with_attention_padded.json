@@ -1,40 +1,49 @@
 {
     "seed": 42,
-    "description": "Vanilla Seq2Seq Model",
+    "description": "Seq2Seq with Attention Model and Padding",
     "output_dir": "./checkpoints/",
-    "checkpoints_dir": "vanilla_seq2seq",
-    "cudnn_deterministic": false,
+    "checkpoints_dir": "seq2seq_with_attention_padded",
+    "cudnn_deterministic": true,
     "dataset": {
       "module": "data.multi30k",
       "main": "Multi30kData",
       "args": {
-        "include_lengths": false
+        "include_lengths": true
       }
     },
     "model_encoder": {
-        "module": "model.vanilla_seq2seq",
+        "module": "model.seq2seq_with_attention_padded",
         "main": "Encoder",
         "args": {
             "input_dim": 0,
             "emb_dim": 256,
-            "hid_dim": 512,
-            "n_layers": 2,
+            "enc_hid_dim": 512,
+            "dec_hid_dim": 512,
             "dropout": 0.5
         }
     },
+    "model_attention": {
+        "module": "model.seq2seq_with_attention_padded",
+        "main": "Attention",
+        "args": {
+            "enc_hid_dim": 512,
+            "dec_hid_dim": 512
+        }
+    },
     "model_decoder": {
-        "module": "model.vanilla_seq2seq",
+        "module": "model.seq2seq_with_attention_padded",
         "main": "Decoder",
         "args": {
             "output_dim": 0,
             "emb_dim": 256,
-            "hid_dim": 512,
-            "n_layers": 2,
-            "dropout": 0.5
+            "enc_hid_dim": 512,
+            "dec_hid_dim": 512,
+            "dropout": 0.5,
+            "attention": ""
         }
     },
     "seq2seq_model": {
-        "module": "model.vanilla_seq2seq",
+        "module": "model.seq2seq_with_attention_padded",
         "main": "Seq2Seq"
     },
     "optimizer": {
@@ -51,7 +60,7 @@
         }
     },
     "trainer": {
-        "module": "trainer.seq2seq_trainer",
+        "module": "trainer.seq2seq_with_attention_padded_trainer",
         "main": "Trainer",
         "epochs": 10,
         "batch_size": 2,
@@ -63,6 +72,6 @@
         }
     },
     "data": {
-        "sort_within_batch": false
+      "sort_within_batch": true
     }
 }
