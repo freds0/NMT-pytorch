@@ -11,7 +11,7 @@ class Trainer(BaseTrainer):
         self.test_dataloader = test_dataloader
 
 
-    def _train_epoch(self, epoch):
+    def _train_epoch(self, epoch, clip = 1):
         total_loss = 0.0
         len_dataset = len(self.train_dataloader)
         step = 0

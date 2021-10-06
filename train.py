@@ -54,7 +54,7 @@ def main(config, resume):
             batch_size = BATCH_SIZE,
             device = device)
     '''
-    if config["seq2seq_model"]["module"] == "model.seq2seq_with_attention":
+    if config["seq2seq_model"]["module"] == "model.seq2seq_with_attention" or config["seq2seq_model"]["module"] == "model.seq2seq_with_attention_padded":
         att = initialize_config(config["model_attention"])
         config["model_decoder"]["args"]["attention"] = att
 
